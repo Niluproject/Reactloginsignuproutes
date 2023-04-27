@@ -4,6 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from 'react-router-dom';
+// import ResetPassword from './ResetPassword';
 const Login = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState({
@@ -22,27 +23,57 @@ const Login = () => {
 
   const handleChange = e => {
     const { name, value } = e.target
-    //console.log(name, value);
     setUser({
       ...user,
       [name]: value
     })
   }
-  const login = () => {
+
+  const handleForgotPassword = () => {
+    Swal.fire({
+      title: "Enter your email",
+      input: "email",
+      confirmButtonText: "Reset Password",
+      showCancelButton: true,
+      cancelButtonText: "Cancel",
+      inputValidator: (value) => {
+        if (!value) {
+          return "Please enter your email";
+        }
+      },
+      preConfirm: async (email) => {
+        try {
+          const response = await axios.post("http://localhost:9003/forgot-password", { email });
+          const message = response.data.message;
+          Swal.fire({
+            title: "Success!",
+            text: message,
+            icon: "success",
+          });
+        } catch (error) {
+          const errorMessage = error.response.data.error;
+          Swal.fire({
+            title: "Error",
+            text: errorMessage,
+            icon: "error",
+          });
+        }
+      },
+    });
+  };
+
+  const handleLogin = () => {
     const { email, password } = user
     if (email && password) {
       axios.post("http://localhost:9003/login", user)
         .then(res => {
-          console.log(res);
           localStorage.setItem('user', JSON.stringify(res.data.user));
           Swal.fire({
-            imageWidth: 150,
-            imageHeight: 150,
-            imageAlt: "Success",
-            confirmButtonColor: "#007aff",
-            width: 400,
             title: "SUCCESS!",
             text: res.data.message,
+            icon: "success",
+            confirmButtonColor: "#007aff",
+            width: 400,
           }).then(() => {
             const item = localStorage.getItem('user');
             const auth = item !== '' ? JSON.parse(item) : '';
@@ -53,15 +84,12 @@ const Login = () => {
           });
         }).catch(error => {
           Swal.fire({
-            imageWidth: 150,
-            imageHeight: 150,
-            imageAlt: "error",
-            confirmButtonColor: "#007aff",
-            width: 400,
             title: "UNAUTHORIZE!",
             text: error.response.data.error,
+            icon: "error",
+            confirmButtonColor: "#007aff",
+            width: 400,
           });
-          navigate("/login"); // <-- add this line
         });
     } else {
       Swal.fire({
@@ -73,17 +101,15 @@ const Login = () => {
     }
   }
 
-
-
-
-
   return (
     <div className="login">
       <h1>Login</h1>
       <input type="text" name="email" value={user.email} onChange={handleChange} placeholder="Enter Your Email"></input>
       <input type="password" name="password" value={user.password} onChange={handleChange} placeholder="Enter Your Password"></input>
-      <div className="button" onClick={login}>Login</div>
+      <div className="button" onClick={handleLogin}>Login</div>
+      <div className="forgot-password" onClick={handleForgotPassword}>Forgot password?</div>
       <div>or</div>
+      {/* <ResetPassword /> */}
       <div className="button" onClick={() => navigate("/signup")}>Register</div>
     </div>
   )
