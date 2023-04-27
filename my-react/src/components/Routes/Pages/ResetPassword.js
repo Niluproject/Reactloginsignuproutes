@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import '../assets/css/login.css'
 
 const ResetPassword = () => {
+    const navigate = useNavigate();
     const [resetToken, setResetToken] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -21,6 +24,11 @@ const ResetPassword = () => {
 
         axios.post('http://localhost:9003/reset-password', { resetToken, password })
             .then((res) => {
+                // Reset state values
+                setResetToken('');
+                setPassword('');
+                setConfirmPassword('');
+
                 Swal.fire({
                     title: 'SUCCESS!',
                     text: res.data.message,
@@ -28,20 +36,12 @@ const ResetPassword = () => {
                     confirmButtonColor: '#007aff',
                     width: 400,
                 });
+                navigate("/login")
             })
-            .catch((error) => {
-                Swal.fire({
-                    title: 'Error',
-                    text: error.response.data.error,
-                    icon: 'error',
-                    confirmButtonColor: '#007aff',
-                    width: 400,
-                });
-            });
     };
 
     return (
-        <div className='reset-password'>
+        <div className='reset-password login'>
             <h2>Reset Password</h2>
             <input
                 type='text'

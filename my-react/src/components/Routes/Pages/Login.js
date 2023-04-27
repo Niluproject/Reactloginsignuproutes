@@ -109,7 +109,6 @@ const Login = () => {
       <div className="button" onClick={handleLogin}>Login</div>
       <div className="forgot-password" onClick={handleForgotPassword}>Forgot password?</div>
       <div>or</div>
-      {/* <ResetPassword /> */}
       <div className="button" onClick={() => navigate("/signup")}>Register</div>
     </div>
   )
