@@ -24,23 +24,37 @@ const Signup = () => {
         })
     }
     const register = () => {
-        const { name, email, password, reEnterPassword } = user
+        const { name, email, password, reEnterPassword } = user;
         if (name && email && password && (password === reEnterPassword)) {
-            alert("Posted");
             axios.post("http://localhost:9003/register", user)
                 .then(res => {
-                    alert(res.data.message)
-                    navigate("/login")
+                    Swal.fire({
+                        title: "Success",
+                        text: res.data.message,
+                        icon: "success",
+                        confirmButtonText: "OK",
+                    }).then(() => {
+                        navigate("/login");
+                    });
                 })
+                .catch(err => {
+                    Swal.fire({
+                        title: "Error",
+                        text: err.response.data.message,
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    });
+                });
         } else {
             Swal.fire({
-                title: "Wrong",
-                text: "Invalid Input",
-                icon: "!",
+                title: "Invalid Input",
+                text: "Please enter all required fields and make sure passwords match",
+                icon: "error",
                 confirmButtonText: "OK",
             });
         }
-    }
+    };
+
     return (
         <div className="register">
             {console.log("user", user)}

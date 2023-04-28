@@ -46,19 +46,20 @@ app.post("/login", async (req, res) => {
     try {
         const user = await User.findOne({ email: email });
         if (user) {
-            if (password === user.password) {
-                res.status(200).send({ message: "Login Successfull", user: user });
+            const passwordMatch = await bcrypt.compare(password, user.password);
+            if (passwordMatch) {
+                res.status(200).send({ message: "Login Successful", user: user });
             } else {
-                console.log(err);
-                res.status(401).send({ error: "Password didn't match" });
+                res.status(401).send({ error: "Password doesn't match" });
             }
         } else {
-            res.send({ message: "User not registered" });
+            res.status(404).send({ error: "User not registered" });
         }
     } catch (error) {
         res.send({ message: "Error occurred", error: error });
     }
 });
+
 
 // Routes Login //
 
@@ -69,20 +70,23 @@ app.post("/register", async (req, res) => {
     try {
         const user = await User.findOne({ email: email });
         if (user) {
-            res.send({ message: "User already registered" });
+            res.status(400).send({ error: "User already exists" });
         } else {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
             const newUser = new User({
-                name,
-                email,
-                password
+                name: name,
+                email: email,
+                password: hashedPassword,
             });
-            await newUser.save();
-            res.send({ message: "Successfully Registered, Please login now." });
+            const savedUser = await newUser.save();
+            res.status(200).send({ message: "User registered successfully", user: savedUser });
         }
     } catch (error) {
         res.send({ message: "Error occurred", error: error });
     }
 });
+
 
 // Routes Register //
 
