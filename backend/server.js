@@ -39,7 +39,7 @@ const User = new mongoose.model("User", userSchema);
 
 // Create login/Register Model End //
 
-// Routes Login //
+// Routes Login Start //
 
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
@@ -61,9 +61,9 @@ app.post("/login", async (req, res) => {
 });
 
 
-// Routes Login //
+// Routes Login End //
 
-// Routes Register //
+// Routes Register Start //
 
 app.post("/register", async (req, res) => {
     const { name, email, password } = req.body;
@@ -87,10 +87,9 @@ app.post("/register", async (req, res) => {
     }
 });
 
+// Routes Register End //
 
-// Routes Register //
-
-// Using Forgot password Implementation start //
+// Email Credential using Gmail Service //
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -99,6 +98,8 @@ const transporter = nodemailer.createTransport({
         pass: process.env.PASSWORD
     }
 });
+
+// Routes Forgot-Password Start //
 
 app.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
@@ -130,6 +131,9 @@ app.post('/forgot-password', async (req, res) => {
     }
 });
 
+// Routes Forgot-Password End //
+
+// Routes Reset-Password Start //
 
 app.post('/reset-password', async (req, res) => {
     const { resetToken, password } = req.body;
@@ -157,9 +161,7 @@ app.post('/reset-password', async (req, res) => {
     }
 });
 
-
-
-// Routes Register //
+// Routes Reset-Password End //
 
 app.listen(9003, () => {
     console.log("BE started at port 9003");
